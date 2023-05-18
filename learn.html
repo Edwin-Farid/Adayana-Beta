@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adayana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8">Adayana Beta</h1>
+        <div class="bg-white shadow rounded p-4">
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold">Address:</h2>
+                <p id="welcome"></p>
+            </div>
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold">Owner:</h2>
+                <p id="pemilik"></p>
+            </div>
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold">Status Profile:</h2>
+                <p id="rawText"></p>
+            </div>
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold">Follower:</h2>
+                <p id="angka"></p>
+            </div>
+            <form class="mb-4">
+                <label class="text-2xl font-bold">Change Status Profile:</label>
+                <input type="text" id="textRaw" class="w-full border border-gray-300 rounded px-4 py-2"
+                    placeholder="Swag status">
+            </form>
+            <div class="flex justify-between">
+                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    onclick="connect()" id="wallet">Connect wallet</a>
+                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    onclick="loadData()">Load data</a>
+                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    onclick="count()">Follow</a>
+                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    onclick="setText()">Change Status</a>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+<script src="abi.js"></script>
+
+<script>
+    let provider;
+
+    let account;
+
+    let learnContract;
+
+    async function loadData() {
+        document.getElementById("pemilik").innerText = await learnContract.getOwner()
+        document.getElementById("rawText").innerText = await learnContract.textRaw()
+        document.getElementById("angka").innerText = await learnContract.angka()
+    }
+
+    async function setText() {
+        const textValue = document.getElementById("textRaw").value
+        const learn = await learnContract.connect(await provider.getSigner())
+        await learn.setText(textValue)
+        await loadData()
+    }
+
+    async function count() {
+        const learn = await learnContract.connect(await provider.getSigner())
+        await learn.count()
+        await loadData()
+    }
+    async function connect() {
+        await ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        account = await provider.getSigner().getAddress()
+        document.getElementById("welcome").innerText += account
+        {{/*  document.getElementById("wallet").classList.add("invisible");  */}}
+
+        learnContract = new ethers.Contract("0x5FbDB2315678afecb367f032d93F642f64180aa3", abi, provider)
+
+        await loadData();
+    }
+    window.addEventListener('load', async () => { })
+</script>
+
+</html>
